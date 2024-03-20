@@ -32,6 +32,11 @@ async def read_url(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Item not found'
         )
+    if url.deleted:
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail='Item deleted'
+        )
     return url
 
 

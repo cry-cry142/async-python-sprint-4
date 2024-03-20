@@ -31,7 +31,9 @@ class Repository:
         raise NotImplementedError
 
 
-class RepositoryDB(Repository, Generic[ModelType, CreateSchemaType]):
+class RepositoryDB(
+    Repository, Generic[ModelType, CreateSchemaType]
+):
     def __init__(self, model: Type[ModelType]):
         self._model = model
 
@@ -72,7 +74,6 @@ class RepositoryDB(Repository, Generic[ModelType, CreateSchemaType]):
         statement = select(self._model).where(self._model.id == id)
         result = await db.execute(statement=statement)
         db_obj = result.scalar_one_or_none()
-        # db.delete(db_obj)
         await db.delete(db_obj)
         await db.commit()
         return db_obj
