@@ -3,14 +3,14 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from core.config import settings
-from api.v1.base import router
+from api.v1.base import api_router
 
 app = FastAPI(
     title=settings.app_title,
     docs_url='/api/v1/docs',
     default_response_class=ORJSONResponse,
 )
-app.include_router(router, prefix='/api/v1')
+app.include_router(api_router, prefix='/api/v1')
 
 
 if __name__ == '__main__':
