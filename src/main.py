@@ -9,7 +9,7 @@ from api.v1.base import api_router
 
 
 BLACK_LIST = [
-    '127.0.0.1'
+    '127.0.0.5'
 ]
 
 

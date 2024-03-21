@@ -4,5 +4,9 @@ services:
   db:
     image: postgres:16
     env_file: src/.env
+  project:
+    build: ./src/
+    depends_on:
+      - db
     ports:
-      - "5432:5432"
+      - "80:8080"

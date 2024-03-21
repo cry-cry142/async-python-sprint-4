@@ -111,20 +111,22 @@ GET /<shorten-url-id>/status?[full-info]&[max-result=10]&[offset=0]
 toch src/.env
 ``` 
 
-БД запустить можно через docker-compose.yml или вручную.
+БД запустить можно через docker-compose.yml:
 
 ```bash
 docker-compose up -d
 ```
 
-Установите зависимости и выполните миграции БД.
+Выполните миграции в БД через docker-compose:
 
-```python
-alembic upgrade head
+```bash
+docker-compose exec project alembic upgrade head
 ```
 
-Запустите проект:
+Наслаждайтесь!
+
+## Дока?
 
 ```python
-python main.py
+GET /api/v1/docs
 ```
