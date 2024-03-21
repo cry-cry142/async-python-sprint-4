@@ -17,6 +17,7 @@ class AppSettings(BaseSettings):
     project_host: str = 'localhost'
     project_port: int = 8000
     database_dsn: PostgresDsn
+    debug: bool = False
 
     class Config:
         env_file = ENV_PATH
