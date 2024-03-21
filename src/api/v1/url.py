@@ -1,13 +1,23 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.urls import Url
 from db.db import get_session
 from schemas import url as url_schema
 from services.url import url_crud
 
 
 router = APIRouter()
+
+
+async def is_deleted(obj: Url):
+    if obj and obj.deleted:
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail='Item has been deleted'
+        )
 
 
 @router.get('/', response_model=List[url_schema.Url])
@@ -20,24 +30,47 @@ async def read_urls(
     return urls
 
 
-@router.get('/{id}', response_model=url_schema.Url)
+@router.get('/{short_id}')
 async def read_url(
     *,
     db: AsyncSession = Depends(get_session),
-    id: int,
+    short_id: str,
 ) -> Any:
-    url = await url_crud.get(db=db, id=id)
+    url = await url_crud.get(db=db, short_id=short_id)
     if not url:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Item not found'
         )
-    if url.deleted:
+    await is_deleted(url)
+    resp = Response(
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={'Location': url.url}
+    )
+    return resp
+
+
+@router.get('/{short_id}/status')
+async def status_url(
+    *,
+    db: AsyncSession = Depends(get_session),
+    short_id: str
+) -> Any:
+    url = await url_crud.get(db=db, short_id=short_id, used=False)
+    if not url:
         raise HTTPException(
-            status_code=status.HTTP_410_GONE,
-            detail='Item deleted'
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Item not found'
         )
-    return url
+    result = {}
+    result['count_used'] = url.count_used
+    try:
+        await is_deleted(url)
+    except HTTPException:
+        result['status'] = 'deleted'
+    else:
+        result['status'] = 'exists'
+    return JSONResponse(content=result)
 
 
 @router.post(
@@ -51,15 +84,16 @@ async def create_url(
     db: AsyncSession = Depends(get_session),
 ) -> Any:
     url = await url_crud.create(db=db, obj_in=url_in)
+    await is_deleted(url)
     return url
 
 
-@router.delete('/{id}')
+@router.delete('/{short_id}')
 async def delete_url(
-    id: int,
+    short_id: str,
     db: AsyncSession = Depends(get_session),
 ):
-    url = await url_crud.delete(db=db, id=id)
+    url = await url_crud.delete(db=db, short_id=short_id)
     if not url:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

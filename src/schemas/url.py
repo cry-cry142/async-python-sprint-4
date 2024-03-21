@@ -3,7 +3,6 @@ from pydantic import BaseModel, HttpUrl
 
 class UrlBase(BaseModel):
     url: HttpUrl
-    # short_url: str
 
 
 class UrlCreate(UrlBase):
@@ -20,8 +19,4 @@ class UrlInDBBase(UrlBase):
 
 
 class Url(UrlInDBBase):
-    pass
-
-
-class UrlInDB(UrlInDBBase):
     pass

@@ -5,7 +5,7 @@ from .base import Base
 
 
 class Url(Base):
-    __tablename__ = 'URL'
+    __tablename__ = 'url'
     id = Column(Integer, primary_key=True)
     url = Column(URLType, unique=True, nullable=False)
     short_url = Column(URLType, unique=True, nullable=False)
